@@ -134,7 +134,7 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
             } catch (IllegalStateException e) {
                 Log.e(TAG, "Failed to start camera preview.", e);
             } catch (IllegalArgumentException e) {
-                Log.e(TAG, "Something went wrong: " + e.getClass().getName());
+                Log.e(TAG, "Something went wrong: " + e.getMessage());
                 mCallback.onMountError();
             }
         }
