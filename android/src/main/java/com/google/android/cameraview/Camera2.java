@@ -37,6 +37,7 @@ import android.media.CamcorderProfile;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.MediaRecorder;
+import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.SparseIntArray;
@@ -61,6 +62,14 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
     private static final String TAG = "Camera2";
 
     private static final SparseIntArray INTERNAL_FACINGS = new SparseIntArray();
+
+    private static final Integer MAX_CAMERA_RETRY = 3;
+
+    private Integer cameraRetryCounter = 0;
+
+    private  HandlerThread backgroundThread = null;
+
+    private Handler backgroundHandler = null;
 
     static {
         INTERNAL_FACINGS.put(Constants.FACING_BACK, CameraCharacteristics.LENS_FACING_BACK);
@@ -95,6 +104,7 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
 
         @Override
         public void onClosed(@NonNull CameraDevice camera) {
+            mCamera = null;
             mCallback.onCameraClosed();
         }
 
@@ -302,9 +312,12 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
         mInitialRatio = null;
         prepareStillImageReader();
         prepareScanImageReader();
+        startBackgroundThread();
         startOpeningCamera();
         return true;
     }
+
+
 
     @Override
     void stop() {
@@ -338,6 +351,8 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
                 mIsRecording = false;
             }
         }
+        stopBackgroundThread();
+
     }
 
     @Override
@@ -657,6 +672,16 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
         mPreview.setDisplayOrientation(mDeviceOrientation);
     }
 
+    private void handleFailedCamera(Exception e) {
+        mCaptureSession = null;
+        if (cameraRetryCounter <= MAX_CAMERA_RETRY) {
+            cameraRetryCounter++;
+            startCaptureSession();
+        } else {
+            mCallback.onMountError();
+        }
+    }
+
     /**
      * <p>Chooses a camera ID by the specified camera facing ({@link #mFacing}).</p>
      * <p>This rewrites {@link #mCameraId}, {@link #mCameraCharacteristics}, and optionally
@@ -777,13 +802,34 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
         mScanImageReader.setOnImageAvailableListener(mOnImageAvailableListener, null);
     }
 
+    private void startBackgroundThread() {
+        backgroundThread = new HandlerThread("CameraBackgroundThread");
+        backgroundThread.start();
+        backgroundHandler = new Handler(backgroundThread.getLooper());
+    }
+
+    private void stopBackgroundThread() {
+        if (backgroundThread != null) {
+            backgroundThread.quitSafely();
+            try {
+                backgroundThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            backgroundThread = null;
+            backgroundHandler = null;
+        }
+
+    }
+
+
     /**
      * <p>Starts opening a camera device.</p>
      * <p>The result will be processed in {@link #mCameraDeviceCallback}.</p>
      */
     private void startOpeningCamera() {
         try {
-            mCameraManager.openCamera(mCameraId, mCameraDeviceCallback, null);
+            mCameraManager.openCamera(mCameraId, mCameraDeviceCallback, backgroundHandler);
         } catch (CameraAccessException e) {
             throw new RuntimeException("Failed to open camera: " + mCameraId, e);
         }
@@ -810,8 +856,9 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
             }
             mCamera.createCaptureSession(Arrays.asList(surface, mStillImageReader.getSurface(),
                     mScanImageReader.getSurface()), mSessionCallback, null);
+            cameraRetryCounter = 0;
         } catch (CameraAccessException e) {
-            mCallback.onMountError();
+            handleFailedCamera(e);
         }
     }
 
