@@ -38,7 +38,7 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.media.MediaRecorder;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Surface;
@@ -251,7 +251,7 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
 
     private int mFlash;
 
-    private int mExposure;
+    private float mExposure;
 
     private int mCameraOrientation;
 
@@ -495,12 +495,12 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
     }
 
     @Override
-    int getExposureCompensation() {
+    float getExposureCompensation() {
         return mExposure;
     }
 
     @Override
-    void setExposureCompensation(int exposure) {
+    void setExposureCompensation(float exposure) {
         Log.e("CAMERA_2:: ", "Adjusting exposure is not currently supported for Camera2");
     }
 
@@ -1100,6 +1100,9 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
 
     // Much credit - https://gist.github.com/royshil/8c760c2485257c85a11cafd958548482
     void setFocusArea(float x, float y) {
+        if (mCaptureSession == null) {
+            return;
+        }
         CameraCaptureSession.CaptureCallback captureCallbackHandler = new CameraCaptureSession.CaptureCallback() {
             @Override
             public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
@@ -1124,7 +1127,6 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
 
         try {
             mCaptureSession.stopRepeating();
-
         } catch (CameraAccessException e) {
             Log.e(TAG, "Failed to manual focus.", e);
         }

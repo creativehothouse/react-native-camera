@@ -99,6 +99,7 @@ type PictureOptions = {
   base64?: boolean,
   mirrorImage?: boolean,
   exif?: boolean,
+  writeExif?: boolean | { [name: string]: any },
   width?: number,
   fixOrientation?: boolean,
   forceUpOrientation?: boolean,
@@ -230,6 +231,13 @@ type EventCallbackArgumentsType = {
   nativeEvent: Object,
 };
 
+type Rect = {
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+};
+
 type PropsType = typeof View.props & {
   zoom?: number,
   ratio?: string,
@@ -259,6 +267,7 @@ type PropsType = typeof View.props & {
   playSoundOnCapture?: boolean,
   videoStabilizationMode?: number | string,
   pictureSize?: string,
+  rectOfInterest: Rect,
 };
 
 type StateType = {
@@ -400,6 +409,7 @@ export default class Camera extends React.Component<PropsType, StateType> {
     videoStabilizationMode: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     pictureSize: PropTypes.string,
     mirrorVideo: PropTypes.bool,
+    rectOfInterest: PropTypes.any,
     defaultVideoQuality: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   };
 
@@ -410,7 +420,7 @@ export default class Camera extends React.Component<PropsType, StateType> {
     type: CameraManager.Type.back,
     autoFocus: CameraManager.AutoFocus.on,
     flashMode: CameraManager.FlashMode.off,
-    exposure: 0,
+    exposure: -1,
     whiteBalance: CameraManager.WhiteBalance.auto,
     faceDetectionMode: (CameraManager.FaceDetection || {}).fast,
     barCodeTypes: Object.values(CameraManager.BarCodeType),
@@ -489,6 +499,10 @@ export default class Camera extends React.Component<PropsType, StateType> {
 
     if (options.pauseAfterCapture === undefined) {
       options.pauseAfterCapture = false;
+    }
+
+    if (!this._cameraHandle) {
+      throw 'Camera handle cannot be null';
     }
 
     return await CameraManager.takePicture(options, this._cameraHandle);
@@ -644,7 +658,7 @@ export default class Camera extends React.Component<PropsType, StateType> {
     if (permissionDialogTitle || permissionDialogMessage) {
       // eslint-disable-next-line no-console
       console.warn(
-        'permissionDialogTitle and permissionDialogMessage are depracated. Please use androidCameraPermissionOptions instead.',
+        'permissionDialogTitle and permissionDialogMessage are deprecated. Please use androidCameraPermissionOptions instead.',
       );
       cameraPermissions = {
         ...cameraPermissions,
