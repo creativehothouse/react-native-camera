@@ -273,7 +273,7 @@ export default class CameraScreen extends React.Component {
 
   renderCamera() {
     const { canDetectFaces, canDetectText, canDetectBarcode } = this.state;
-
+    
     const drawFocusRingPosition = {
       top: this.state.autoFocusPoint.drawRectPosition.y - 32,
       left: this.state.autoFocusPoint.drawRectPosition.x - 32,
@@ -295,12 +295,8 @@ export default class CameraScreen extends React.Component {
         whiteBalance={this.state.whiteBalance}
         ratio={this.state.ratio}
         focusDepth={this.state.depth}
-        androidCameraPermissionOptions={{
-          title: 'Permission to use camera',
-          message: 'We need your permission to use your camera',
-          buttonPositive: 'Ok',
-          buttonNegative: 'Cancel',
-        }}
+        permissionDialogTitle={'Permission to use camera'}
+        permissionDialogMessage={'We need your permission to use your camera phone'}
         faceDetectionLandmarks={
           RNCamera.Constants.FaceDetection.Landmarks
             ? RNCamera.Constants.FaceDetection.Landmarks.all

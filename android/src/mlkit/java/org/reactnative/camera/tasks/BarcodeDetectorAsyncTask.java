@@ -130,7 +130,6 @@ public class BarcodeDetectorAsyncTask extends android.os.AsyncTask<Void, Void, V
       String rawValue = barcode.getRawValue();
 
       int valueType = barcode.getValueType();
-      int valueFormat = barcode.getFormat();
 
       WritableMap serializedBarcode = Arguments.createMap();
 
@@ -279,7 +278,6 @@ public class BarcodeDetectorAsyncTask extends android.os.AsyncTask<Void, Void, V
       serializedBarcode.putString("data", barcode.getDisplayValue());
       serializedBarcode.putString("dataRaw", rawValue);
       serializedBarcode.putString("type", BarcodeFormatUtils.get(valueType));
-      serializedBarcode.putString("format", BarcodeFormatUtils.getFormat(valueFormat));
       serializedBarcode.putMap("bounds", processBounds(bounds));
       barcodesList.pushMap(serializedBarcode);
     }

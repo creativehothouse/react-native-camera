@@ -24,12 +24,12 @@ import android.media.CamcorderProfile;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.os.ParcelableCompat;
-import androidx.core.os.ParcelableCompatCreatorCallbacks;
-import androidx.core.view.ViewCompat;
+import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.os.ParcelableCompat;
+import android.support.v4.os.ParcelableCompatCreatorCallbacks;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -478,11 +478,11 @@ public class CameraView extends FrameLayout {
         return mImpl.getFlash();
     }
 
-    public void setExposureCompensation(float exposure) {
+    public void setExposureCompensation(int exposure) {
         mImpl.setExposureCompensation(exposure);
     }
 
-    public float getExposureCompensation() {
+    public int getExposureCompensation() {
         return mImpl.getExposureCompensation();
     }
 
@@ -653,7 +653,7 @@ public class CameraView extends FrameLayout {
         @Flash
         int flash;
 
-        float exposure;
+        int exposure;
 
         float focusDepth;
 
@@ -672,7 +672,7 @@ public class CameraView extends FrameLayout {
             ratio = source.readParcelable(loader);
             autoFocus = source.readByte() != 0;
             flash = source.readInt();
-            exposure = source.readFloat();
+            exposure = source.readInt();
             focusDepth = source.readFloat();
             zoom = source.readFloat();
             whiteBalance = source.readInt();
@@ -691,7 +691,7 @@ public class CameraView extends FrameLayout {
             out.writeParcelable(ratio, 0);
             out.writeByte((byte) (autoFocus ? 1 : 0));
             out.writeInt(flash);
-            out.writeFloat(exposure);
+            out.writeInt(exposure);
             out.writeFloat(focusDepth);
             out.writeFloat(zoom);
             out.writeInt(whiteBalance);

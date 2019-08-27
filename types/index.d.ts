@@ -11,7 +11,7 @@
  * If you are seeing this from the future, please, send us your cutting-edge technology :) (if it exists)
  */
 import { Component, ReactNode } from 'react';
-import { NativeMethodsMixinStatic, ViewProperties, findNodeHandle } from 'react-native';
+import { ViewProperties } from 'react-native';
 
 type Orientation = Readonly<{
   auto: any;
@@ -133,19 +133,17 @@ export interface RNCameraProps {
   children?: ReactNode | FaCC;
 
   autoFocus?: keyof AutoFocus;
-  autoFocusPointOfInterest?: Point;
   type?: keyof CameraType;
   flashMode?: keyof FlashMode;
   notAuthorizedView?: JSX.Element;
   pendingAuthorizationView?: JSX.Element;
   useCamera2Api?: boolean;
-  exposure?: number;
   whiteBalance?: keyof WhiteBalance;
   captureAudio?: boolean;
 
   onCameraReady?(): void;
   onStatusChange?(event: {
-    cameraStatus: keyof CameraStatus;
+    cameraStatus: CameraStatus;
     recordAudioPermissionStatus: keyof RecordAudioPermissionStatus;
   }): void;
   onMountError?(error: { message: string }): void;
@@ -186,28 +184,12 @@ export interface RNCameraProps {
   // -- ANDROID ONLY PROPS
   /** Android only */
   ratio?: string;
-  /** Android only - Deprecated */
+  /** Android only */
   permissionDialogTitle?: string;
-  /** Android only - Deprecated */
+  /** Android only */
   permissionDialogMessage?: string;
   /** Android only */
   playSoundOnCapture?: boolean;
-
-  androidCameraPermissionOptions?: {
-    title: string;
-    message: string;
-    buttonPositive?: string;
-    buttonNegative?: string;
-    buttonNeutral?: string;
-  };
-
-  androidRecordAudioPermissionOptions?: {
-    title: string;
-    message: string;
-    buttonPositive?: string;
-    buttonNegative?: string;
-    buttonNeutral?: string;
-  };
 
   // -- IOS ONLY PROPS
   defaultVideoQuality?: keyof VideoQuality;
@@ -354,7 +336,6 @@ interface TakePictureOptions {
   /** Android only */
   skipProcessing?: boolean;
   fixOrientation?: boolean;
-  writeExif?: boolean | { [name: string]: any };
 
   /** iOS only */
   forceUpOrientation?: boolean;
@@ -398,9 +379,6 @@ interface RecordResponse {
 
 export class RNCamera extends Component<RNCameraProps & ViewProperties> {
   static Constants: Constants;
-
-  _cameraRef: null | NativeMethodsMixinStatic;
-  _cameraHandle: ReturnType<typeof findNodeHandle>;
 
   takePictureAsync(options?: TakePictureOptions): Promise<TakePictureResponse>;
   recordAsync(options?: RecordOptions): Promise<RecordResponse>;

@@ -1,6 +1,6 @@
 package org.reactnative.camera;
 
-import androidx.annotation.Nullable;
+import android.support.annotation.Nullable;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
@@ -84,7 +84,7 @@ public class CameraViewManager extends ViewGroupManager<RNCameraView> {
   }
 
   @ReactProp(name = "exposure")
-  public void setExposureCompensation(RNCameraView view, float exposure){
+  public void setExposureCompensation(RNCameraView view, int exposure){
     view.setExposureCompensation(exposure);
   }
 

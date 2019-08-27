@@ -252,12 +252,8 @@ export default class CameraScreen extends React.Component {
         ratio={this.state.ratio}
         focusDepth={this.state.depth}
         trackingEnabled
-        androidCameraPermissionOptions={{
-          title: 'Permission to use camera',
-          message: 'We need your permission to use your camera',
-          buttonPositive: 'Ok',
-          buttonNegative: 'Cancel',
-        }}
+        permissionDialogTitle={'Permission to use camera'}
+        permissionDialogMessage={'We need your permission to use your camera phone'}
         faceDetectionLandmarks={
           RNCamera.Constants.FaceDetection.Landmarks
             ? RNCamera.Constants.FaceDetection.Landmarks.all

@@ -1,8 +1,4 @@
----
-id: expo_usage
-title: Expo Usage
-sidebar_label: Expo Usage
----
+# [Expo](https://expo.io/) Usage
 
 RNCamera of react-native-camera is heavily based on Expo camera module. Thanks @aalices and Expo for the great work.
 
