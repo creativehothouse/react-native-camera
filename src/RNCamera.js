@@ -99,6 +99,7 @@ type PictureOptions = {
   base64?: boolean,
   mirrorImage?: boolean,
   exif?: boolean,
+  writeExif?: boolean,
   width?: number,
   fixOrientation?: boolean,
   forceUpOrientation?: boolean,
@@ -644,7 +645,7 @@ export default class Camera extends React.Component<PropsType, StateType> {
     if (permissionDialogTitle || permissionDialogMessage) {
       // eslint-disable-next-line no-console
       console.warn(
-        'permissionDialogTitle and permissionDialogMessage are depracated. Please use androidCameraPermissionOptions instead.',
+        'permissionDialogTitle and permissionDialogMessage are deprecated. Please use androidCameraPermissionOptions instead.',
       );
       cameraPermissions = {
         ...cameraPermissions,
