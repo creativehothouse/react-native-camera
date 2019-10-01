@@ -217,6 +217,7 @@ android {
 
 ```xml
 <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+<uses-permission android:name="android.permission.CAMERA" />
 <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 ```
@@ -226,7 +227,7 @@ android {
 ```gradle
 allprojects {
     repositories {
-        maven { url "https://jitpack.io" }
+        maven { url "https://www.jitpack.io" }
         maven { url "https://maven.google.com" }
     }
 }

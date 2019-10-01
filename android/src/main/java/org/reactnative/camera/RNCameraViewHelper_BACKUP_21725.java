@@ -310,6 +310,26 @@ public class RNCameraViewHelper {
   }
 
   public static void setExifData(ExifInterface exifInterface, WritableMap exifMap) {
+<<<<<<< HEAD
+    ReadableMapKeySetIterator iterator = exifMap.keySetIterator();
+    while (iterator.hasNextKey()) {
+      String key = iterator.nextKey();
+      switch (exifMap.getType(key)) {
+        case Null:
+          exifInterface.setAttribute(key, null);
+          break;
+        case Boolean:
+          exifInterface.setAttribute(key, Boolean.toString(exifMap.getBoolean(key)));
+          break;
+        case Number:
+          exifInterface.setAttribute(key, Double.toString(exifMap.getDouble(key)));
+          break;
+        case String:
+          exifInterface.setAttribute(key, exifMap.getString(key));
+          break;
+      }
+    }
+=======
     for (String[] tagInfo : exifTags) {
       String name = tagInfo[1];
       if (exifMap.hasKey(name)) {
@@ -337,6 +357,7 @@ public class RNCameraViewHelper {
                                exifMap.getDouble(ExifInterface.TAG_GPS_LONGITUDE));
       exifInterface.setAltitude(exifMap.getDouble(ExifInterface.TAG_GPS_ALTITUDE));
     }
+>>>>>>> master
   }
 
   public static Bitmap generateSimulatorPhoto(int width, int height) {
