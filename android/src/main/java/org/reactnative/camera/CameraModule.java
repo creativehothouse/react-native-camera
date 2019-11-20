@@ -391,4 +391,23 @@ public class CameraModule extends ReactContextBaseJavaModule {
         }
         promise.resolve(false);
     }
+
+    @ReactMethod
+    public void isCameraOpened(final Promise promise) {
+        final ReactApplicationContext context = getReactApplicationContext();
+        UIManagerModule uiManager = context.getNativeModule(UIManagerModule.class);
+        uiManager.addUIBlock(new UIBlock() {
+            @Override
+            public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
+                final RNCameraView cameraView;
+
+                try {
+                    cameraView = (RNCameraView) nativeViewHierarchyManager.resolveView(viewTag);
+                    promise.resolve(cameraView.isCameraOpened());
+                } catch (Exception e) {
+                    promise.resolve(false);
+                }
+            }
+        });
+    }
 }
