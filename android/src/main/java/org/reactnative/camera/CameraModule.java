@@ -340,6 +340,7 @@ public class CameraModule extends ReactContextBaseJavaModule {
                       promise.reject("E_CAMERA_UNAVAILABLE", "Camera is not running");
                   }
               } catch (Exception e) {
+                  promise.reject("E_CAMERA_UNAVAILABLE", "Camera is not running");
                   e.printStackTrace();
               }
           }
