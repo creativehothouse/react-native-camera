@@ -393,7 +393,7 @@ public class CameraModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void isCameraOpened(final Promise promise) {
+    public void isCameraOpened(final int viewTag, final Promise promise) {
         final ReactApplicationContext context = getReactApplicationContext();
         UIManagerModule uiManager = context.getNativeModule(UIManagerModule.class);
         uiManager.addUIBlock(new UIBlock() {
