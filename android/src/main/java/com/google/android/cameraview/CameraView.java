@@ -22,8 +22,6 @@ import android.graphics.Rect;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.os.Build;
-import android.os.HandlerThread;
-import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
 import androidx.annotation.IntDef;
@@ -93,10 +91,6 @@ public class CameraView extends FrameLayout {
 
     private final DisplayOrientationDetector mDisplayOrientationDetector;
 
-    protected HandlerThread mBgThread;
-    protected Handler mBgHandler;
-
-
     public CameraView(Context context, boolean fallbackToOldApi) {
         this(context, null, fallbackToOldApi);
     }
@@ -108,13 +102,6 @@ public class CameraView extends FrameLayout {
     @SuppressWarnings("WrongConstant")
     public CameraView(Context context, AttributeSet attrs, int defStyleAttr, boolean fallbackToOldApi) {
         super(context, attrs, defStyleAttr);
-
-        // bg hanadler for non UI heavy work
-        mBgThread = new HandlerThread("RNCamera-Handler-Thread");
-        mBgThread.start();
-        mBgHandler = new Handler(mBgThread.getLooper());
-
-
         if (isInEditMode()){
             mCallbacks = null;
             mDisplayOrientationDetector = null;
@@ -127,11 +114,11 @@ public class CameraView extends FrameLayout {
         final PreviewImpl preview = createPreviewImpl(context);
         mCallbacks = new CallbackBridge();
         if (fallbackToOldApi || Build.VERSION.SDK_INT < 21) {
-            mImpl = new Camera1(mCallbacks, preview, mBgHandler);
+            mImpl = new Camera1(mCallbacks, preview);
         } else if (Build.VERSION.SDK_INT < 23) {
-            mImpl = new Camera2(mCallbacks, preview, context, mBgHandler);
+            mImpl = new Camera2(mCallbacks, preview, context);
         } else {
-            mImpl = new Camera2Api23(mCallbacks, preview, context, mBgHandler);
+            mImpl = new Camera2Api23(mCallbacks, preview, context);
         }
 
         // Display orientation detector
@@ -142,13 +129,6 @@ public class CameraView extends FrameLayout {
                 mImpl.setDeviceOrientation(deviceOrientation);
             }
         };
-    }
-
-    public void cleanup(){
-        if(mBgThread != null){
-            mBgThread.quitSafely();
-            mBgThread = null;
-        }
     }
 
     @NonNull
@@ -289,9 +269,9 @@ public class CameraView extends FrameLayout {
                 stop();
             }
             if (Build.VERSION.SDK_INT < 23) {
-                mImpl = new Camera2(mCallbacks, mImpl.mPreview, mContext, mBgHandler);
+                mImpl = new Camera2(mCallbacks, mImpl.mPreview, mContext);
             } else {
-                mImpl = new Camera2Api23(mCallbacks, mImpl.mPreview, mContext, mBgHandler);
+                mImpl = new Camera2Api23(mCallbacks, mImpl.mPreview, mContext);
             }
         } else {
             if (mImpl instanceof Camera1) {
@@ -301,7 +281,7 @@ public class CameraView extends FrameLayout {
             if (wasOpened) {
                 stop();
             }
-            mImpl = new Camera1(mCallbacks, mImpl.mPreview, mBgHandler);
+            mImpl = new Camera1(mCallbacks, mImpl.mPreview);
         }
         start();
     }
@@ -318,7 +298,7 @@ public class CameraView extends FrameLayout {
             //store the state and restore this state after fall back to Camera1
             Parcelable state=onSaveInstanceState();
             // Camera2 uses legacy hardware layer; fall back to Camera1
-            mImpl = new Camera1(mCallbacks, createPreviewImpl(getContext()), mBgHandler);
+            mImpl = new Camera1(mCallbacks, createPreviewImpl(getContext()));
             onRestoreInstanceState(state);
             mImpl.start();
         }

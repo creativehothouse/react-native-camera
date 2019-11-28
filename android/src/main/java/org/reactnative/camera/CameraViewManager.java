@@ -43,7 +43,7 @@ public class CameraViewManager extends ViewGroupManager<RNCameraView> {
 
   @Override
   public void onDropViewInstance(RNCameraView view) {
-    view.onHostDestroy();
+    view.stop();
     super.onDropViewInstance(view);
   }
 

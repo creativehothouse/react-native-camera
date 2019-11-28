@@ -26,12 +26,6 @@
     return captureDevice;
 }
 
-+ (AVCaptureDevice *)deviceWithCameraId:(NSString *)cameraId
-{
-    AVCaptureDevice *device = [AVCaptureDevice deviceWithUniqueID:cameraId];
-    return device;
-}
-
 # pragma mark - Enum conversion
 
 + (AVCaptureVideoOrientation)videoOrientationForInterfaceOrientation:(UIInterfaceOrientation)orientation

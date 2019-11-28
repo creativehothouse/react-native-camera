@@ -53,12 +53,6 @@
       "tests": {
         "title": "Testing",
         "sidebar_label": "Testing"
-<<<<<<< HEAD
-=======
-      },
-      "Tidelift": {
-        "title": "React-Native-Camera for Enterprise"
->>>>>>> master
       }
     },
     "links": {
@@ -66,22 +60,13 @@
       "Guides": "Guides",
       "API": "API",
       "Help": "Help",
-<<<<<<< HEAD
-=======
-      "For Enterprise": "For Enterprise",
->>>>>>> master
       "GitHub": "GitHub"
     },
     "categories": {
       "Getting Started": "Getting Started",
       "Guides": "Guides",
       "API": "API",
-<<<<<<< HEAD
       "Help": "Help"
-=======
-      "Help": "Help",
-      "Enterprise": "Enterprise"
->>>>>>> master
     }
   },
   "pages-strings": {

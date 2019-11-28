@@ -60,16 +60,11 @@
 {
     __weak __typeof(self) weakSelf = self;
     self.orientationCallback = ^(UIInterfaceOrientation orientation) {
-        // Synchronized because this might fire more than once
-        // under some circumstances, causing a very bad loop
-        // to people that uses it.
-        @synchronized (weakSelf) {
-            if (callback && weakSelf.orientationCallback) {
-                callback(orientation);
-            }
-            weakSelf.orientationCallback = nil;
-            [weakSelf pause];
+        if (callback) {
+            callback(orientation);
         }
+        weakSelf.orientationCallback = nil;
+        [weakSelf pause];
     };
     [self resume];
 }
