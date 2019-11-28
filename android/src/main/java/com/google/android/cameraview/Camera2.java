@@ -805,7 +805,6 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
                 if (level == null ||
                         level == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY) {
                     return false;
-<<<<<<< HEAD
                 }
 
                 // set our facing variable so orientation also works as expected
@@ -813,25 +812,12 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
                 if (internal == null) {
                     throw new NullPointerException("Unexpected state: LENS_FACING null");
                 }
-=======
-                }
-
-                // set our facing variable so orientation also works as expected
-                Integer internal = mCameraCharacteristics.get(CameraCharacteristics.LENS_FACING);
-                if (internal == null) {
-                    throw new NullPointerException("Unexpected state: LENS_FACING null");
-                }
->>>>>>> master
                 for (int i = 0, count = INTERNAL_FACINGS.size(); i < count; i++) {
                     if (INTERNAL_FACINGS.valueAt(i) == internal) {
                         mFacing = INTERNAL_FACINGS.keyAt(i);
                         break;
                     }
                 }
-<<<<<<< HEAD
-=======
-
->>>>>>> master
                 mCameraId = _mCameraId;
                 return true;
             }
