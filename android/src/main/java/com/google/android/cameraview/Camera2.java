@@ -817,7 +817,6 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
                         break;
                     }
                 }
-
                 mCameraId = _mCameraId;
                 return true;
             }

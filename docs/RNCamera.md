@@ -82,11 +82,7 @@ const styles = StyleSheet.create({
   },
 });
 
-<<<<<<< HEAD
-AppRegistry.registerComponent('ExampleApp', () => ExampleApp);
-=======
 AppRegistry.registerComponent('App', () => ExampleApp);
->>>>>>> master
 ```
 
 ## FaCC (Function as Child Components)
@@ -178,11 +174,7 @@ const styles = StyleSheet.create({
   },
 });
 
-<<<<<<< HEAD
-AppRegistry.registerComponent('ExampleApp', () => ExampleApp);
-=======
 AppRegistry.registerComponent('App', () => ExampleApp);
->>>>>>> master
 ```
 
 ### `camera`
@@ -261,8 +253,6 @@ Values: `RNCamera.Constants.Type.front` or `RNCamera.Constants.Type.back` (defau
 
 Use the `type` property to specify which camera to use.
 
-<<<<<<< HEAD
-=======
 ### `Android` `cameraId`
 
 Overrides the `type` property and uses the camera given by cameraId. Use `getCameraIds` to get the list of available IDs.
@@ -271,7 +261,6 @@ A common use case for this is to provide a "switch camera" button that loops thr
 
 Note: Variables such as flash might need to be resetted due to the camera not reporting an error when those values are not supported.
 
->>>>>>> master
 ### `whiteBalance`
 
 Values: `RNCamera.Constants.WhiteBalance.sunny`, `RNCamera.Constants.WhiteBalance.cloudy`, `RNCamera.Constants.WhiteBalance.shadow`, `RNCamera.Constants.WhiteBalance.incandescent`, `RNCamera.Constants.WhiteBalance.fluorescent` or `RNCamera.Constants.WhiteBalance.auto` (default)
@@ -634,8 +623,6 @@ Resumes the preview after pausePreview() has been called.
 
 Android only. Returns a promise. The promise will be fulfilled with an object with an array containing strings with all camera aspect ratios supported by the device.
 
-<<<<<<< HEAD
-=======
 ### `Android` `getCameraIdsAsync(): Promise`
 
 Android only. Returns a promise. The promise will be fulfilled with an array containing objects with all camera IDs and type supported by the device.
@@ -646,7 +633,6 @@ The promise will be fulfilled with an array containing objects with some of the 
 
 - `type`: One of `RNCamera.Constants.Type.front` | `RNCamera.Constants.Type.back`
 
->>>>>>> master
 ### `iOS` `isRecording(): Promise<boolean>`
 
 iOS only. Returns a promise. The promise will be fulfilled with a boolean indicating if currently recording is started or stopped.
