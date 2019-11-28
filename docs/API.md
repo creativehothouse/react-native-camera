@@ -2,9 +2,13 @@
 id: api
 title: Work in progress
 ---
+<<<<<<< HEAD
 
 ## API props
 
+=======
+## API props
+>>>>>>> master
 [**wip**]
 
 ## Methods
@@ -12,13 +16,19 @@ title: Work in progress
 ## takePictureAsync()
 
 Returns a promise with TakePictureResponse.
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
 ### Method type
 
 ```ts
 takePictureAsync(options?: TakePictureOptions): Promise<TakePictureResponse>;
 ```
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
 ```ts
 interface TakePictureOptions {
   quality?: number;
@@ -29,11 +39,18 @@ interface TakePictureOptions {
   mirrorImage?: boolean;
   doNotSave?: boolean;
   pauseAfterCapture?: boolean;
+<<<<<<< HEAD
 
   /** Android only */
   skipProcessing?: boolean;
   fixOrientation?: boolean;
   writeExif?: boolean | { [name: string]: any };
+=======
+  writeExif?: boolean | { [name: string]: any };
+
+  /** Android only */
+  fixOrientation?: boolean;
+>>>>>>> master
 
   /** iOS only */
   forceUpOrientation?: boolean;
@@ -60,7 +77,10 @@ takePicture = async () => {
   }
 };
 ```
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
 ---
 
 ## recordAsync()
@@ -72,7 +92,10 @@ Returns a promise with RecordResponse.
 ```ts
 recordAsync(options?: RecordOptions): Promise<RecordResponse>;
 ```
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
 ```ts
 interface RecordOptions {
   quality?: keyof VideoQuality;
@@ -97,6 +120,10 @@ interface RecordResponse {
   /** iOS only */
   codec: VideoCodec[keyof VideoCodec];
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 ```
 
 ### Usage example
@@ -122,6 +149,10 @@ takeVideo = async () => {
 
 ---
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 ## refreshAuthorizationStatus()
 
 Allows to make RNCamera check Permissions again and set status accordingly.
@@ -164,6 +195,10 @@ stopRecording(): void;
 
 ---
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 ## pausePreview()
 
 Pauses the preview. The preview can be resumed again by using resumePreview().
@@ -184,6 +219,10 @@ pausePreview(): void;
 
 ---
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 ## resumePreview()
 
 Resumes the preview after pausePreview() has been called.
@@ -225,6 +264,10 @@ getAvailablePictureSizes(): Promise<string[]>;
 
 ---
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 ## getSupportedRatiosAsync() - Android only
 
 Android only. Returns a promise. The promise will be fulfilled with an object with an array containing strings with all camera aspect ratios supported by the device.
@@ -245,12 +288,19 @@ getSupportedRatiosAsync(): Promise<string[]>;
 
 ---
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 ## isRecording() - iOS only
 
 iOS only. Returns a promise. The promise will be fulfilled with a boolean indicating if currently recording is started or stopped.
 
 ### Method type
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
 ```ts
 isRecording(): Promise<boolean>;
 

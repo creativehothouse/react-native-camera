@@ -276,8 +276,8 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
 
     private Rect mInitialCropRegion;
 
-    Camera2(Callback callback, PreviewImpl preview, Context context) {
-        super(callback, preview);
+    Camera2(Callback callback, PreviewImpl preview, Context context, Handler bgHandler) {
+        super(callback, preview, bgHandler);
         mCameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
         mCameraManager.registerAvailabilityCallback(new CameraManager.AvailabilityCallback() {
             @Override
@@ -732,6 +732,7 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
         } else {
             mCallback.onMountError();
         }
+
     }
 
     /**
@@ -804,6 +805,7 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
                 if (level == null ||
                         level == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY) {
                     return false;
+<<<<<<< HEAD
                 }
 
                 // set our facing variable so orientation also works as expected
@@ -811,12 +813,25 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
                 if (internal == null) {
                     throw new NullPointerException("Unexpected state: LENS_FACING null");
                 }
+=======
+                }
+
+                // set our facing variable so orientation also works as expected
+                Integer internal = mCameraCharacteristics.get(CameraCharacteristics.LENS_FACING);
+                if (internal == null) {
+                    throw new NullPointerException("Unexpected state: LENS_FACING null");
+                }
+>>>>>>> master
                 for (int i = 0, count = INTERNAL_FACINGS.size(); i < count; i++) {
                     if (INTERNAL_FACINGS.valueAt(i) == internal) {
                         mFacing = INTERNAL_FACINGS.keyAt(i);
                         break;
                     }
                 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
                 mCameraId = _mCameraId;
                 return true;
             }
@@ -1303,6 +1318,13 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
                     break;
             }
             captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, getOutputRotation());
+
+
+            if(mCaptureCallback.getOptions().hasKey("quality")){
+                int quality = (int) (mCaptureCallback.getOptions().getDouble("quality") * 100);
+                captureRequestBuilder.set(CaptureRequest.JPEG_QUALITY, (byte)quality);
+            }
+
             captureRequestBuilder.set(CaptureRequest.SCALER_CROP_REGION, mPreviewRequestBuilder.get(CaptureRequest.SCALER_CROP_REGION));
             // Stop preview and capture a still picture.
             mCaptureSession.stopRepeating();
