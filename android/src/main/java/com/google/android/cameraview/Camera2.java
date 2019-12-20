@@ -54,10 +54,13 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
+
+import org.reactnative.camera.utils.ObjectUtils;
+
+
 
 @SuppressWarnings("MissingPermission")
 @TargetApi(21)
@@ -384,13 +387,13 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
 
     @Override
     void setCameraId(String id) {
-        if(!Objects.equals(_mCameraId, id)){
+        if(!ObjectUtils.equals(_mCameraId, id)){
             _mCameraId = id;
 
             // only update if our camera ID actually changes
             // from what we currently have.
             // Passing null will always yield true
-            if(!Objects.equals(_mCameraId, mCameraId)){
+            if(!ObjectUtils.equals(_mCameraId, mCameraId)){
                 // this will call chooseCameraIdByFacing
                 if (isCameraOpened()) {
                     stop();
@@ -454,7 +457,7 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
             mStillImageReader.close();
         }
         if (size == null) {
-          if (mAspectRatio == null) {
+          if (mAspectRatio == null || mPictureSize == null) {
             return;
           }
           mPictureSizes.sizes(mAspectRatio).last();
