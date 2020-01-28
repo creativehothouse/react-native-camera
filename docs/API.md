@@ -2,23 +2,99 @@
 id: api
 title: Work in progress
 ---
-
-## API props
-
+## Props Index
 [**wip**]
+
+- [`zoom`](API.md#zoom)
+- [`maxZoom`](API.md#maxZoom)
+- [`type`](API.md#type)
+- [`cameraId`](API.md#cameraId)
+- [`flashMode`](API.md#flashMode)
+- [`exposure`](API.md#exposure)
+- [`whiteBalance`](API.md#whiteBalance)
+- [`autoFocus`](API.md#autoFocus)
+- [`ratio`](API.md#ratio)
+- [`focusDepth`](API.md#focusDepth)
+- [`onMountError`](API.md#onMountError)
+- [`onCameraReady`](API.md#onCameraReady)
+
+## Methods Index 
+- [`takePictureAsync`](API.md#takePictureAsync())
+- [`recordAsync`](API.md#recordAsync)
+- [`refreshAuthorizationStatus`](API.md#refreshAuthorizationStatus)
+- [`stopRecording`](API.md#stopRecording)
+- [`pausePreview`](API.md#pausePreview)
+- [`resumePreview`](API.md#resumePreview)
+- [`getAvailablePictureSizes`](API.md#getAvailablePictureSizes)
+- [`getSupportedRatiosAsync`](API.md#getSupportedRatiosAsync)
+- [`isRecording`](API.md#isRecording)
+
+## Props
+---
+### `zoom`
+
+This property specifies the zoom value of the camera. Ranges from 0 to 1. Default to 0.
+
+|   Type | Default Value | 
+|   ---- | --------      | 
+| number | 0             | 
+
+---
+### `maxZoom`
+
+The maximum zoom value of the camera. Defaults to 0. 
+
+|   Type | Default Value | 
+|   ---- | --------      | 
+| number | 0             | 
+
+---
+### `type`
+
+This property defines which camera on the phone the component is using. 
+Possible values: 
+- `front`
+- `back`
+
+|   Type | Default Value |
+|   ---- | --------      |
+| number | 'back'        |
+
+---
+### `cameraId`
+
+For selecting from multiple cameras on Android devices. See [2492](https://github.com/react-native-community/react-native-camera/pull/2492) for more info. Can be retrieved with `getCameraIds()`
+
+|   Type | Default Value | Platform     | 
+|   ---- | --------      |  --------    | 
+| String | `null`        | Android      | 
+
+---
+### `flashMode`
+
+Determines the state of the camera flash. Has the following possible states. 
+  ```off: '1',
+  on: 'auto',
+  auto: 'torch',
+  torch: 'off'
+  ```
+
+|   Type | Default Value | 
+|   ---- | --------      | 
+| object | `{ off: 1 }`  | 
+
+---
 
 ## Methods
 
 ## takePictureAsync()
 
 Returns a promise with TakePictureResponse.
-
 ### Method type
 
 ```ts
 takePictureAsync(options?: TakePictureOptions): Promise<TakePictureResponse>;
 ```
-
 ```ts
 interface TakePictureOptions {
   quality?: number;
@@ -29,11 +105,10 @@ interface TakePictureOptions {
   mirrorImage?: boolean;
   doNotSave?: boolean;
   pauseAfterCapture?: boolean;
+  writeExif?: boolean | { [name: string]: any };
 
   /** Android only */
-  skipProcessing?: boolean;
   fixOrientation?: boolean;
-  writeExif?: boolean | { [name: string]: any };
 
   /** iOS only */
   forceUpOrientation?: boolean;
@@ -60,7 +135,6 @@ takePicture = async () => {
   }
 };
 ```
-
 ---
 
 ## recordAsync()
@@ -72,7 +146,6 @@ Returns a promise with RecordResponse.
 ```ts
 recordAsync(options?: RecordOptions): Promise<RecordResponse>;
 ```
-
 ```ts
 interface RecordOptions {
   quality?: keyof VideoQuality;
@@ -97,6 +170,7 @@ interface RecordResponse {
   /** iOS only */
   codec: VideoCodec[keyof VideoCodec];
 }
+
 ```
 
 ### Usage example
@@ -121,6 +195,7 @@ takeVideo = async () => {
 ```
 
 ---
+
 
 ## refreshAuthorizationStatus()
 
@@ -164,6 +239,7 @@ stopRecording(): void;
 
 ---
 
+
 ## pausePreview()
 
 Pauses the preview. The preview can be resumed again by using resumePreview().
@@ -183,6 +259,7 @@ pausePreview(): void;
 ```
 
 ---
+
 
 ## resumePreview()
 
@@ -225,6 +302,7 @@ getAvailablePictureSizes(): Promise<string[]>;
 
 ---
 
+
 ## getSupportedRatiosAsync() - Android only
 
 Android only. Returns a promise. The promise will be fulfilled with an object with an array containing strings with all camera aspect ratios supported by the device.
@@ -245,12 +323,12 @@ getSupportedRatiosAsync(): Promise<string[]>;
 
 ---
 
+
 ## isRecording() - iOS only
 
 iOS only. Returns a promise. The promise will be fulfilled with a boolean indicating if currently recording is started or stopped.
 
 ### Method type
-
 ```ts
 isRecording(): Promise<boolean>;
 
