@@ -37,7 +37,6 @@ import android.media.CamcorderProfile;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.MediaRecorder;
-import android.os.HandlerThread;
 import androidx.annotation.NonNull;
 import android.util.Log;
 import android.util.SparseIntArray;
@@ -69,14 +68,6 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
     private static final String TAG = "Camera2";
 
     private static final SparseIntArray INTERNAL_FACINGS = new SparseIntArray();
-
-    private static final Integer MAX_CAMERA_RETRY = 3;
-
-    private Integer cameraRetryCounter = 0;
-
-    private  HandlerThread backgroundThread = null;
-
-    private Handler backgroundHandler = null;
 
     static {
         INTERNAL_FACINGS.put(Constants.FACING_BACK, CameraCharacteristics.LENS_FACING_BACK);
@@ -111,7 +102,6 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
 
         @Override
         public void onClosed(@NonNull CameraDevice camera) {
-            mCamera = null;
             mCallback.onCameraClosed();
         }
 
@@ -150,10 +140,6 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
                 Log.e(TAG, "Failed to start camera preview because it couldn't access camera", e);
             } catch (IllegalStateException e) {
                 Log.e(TAG, "Failed to start camera preview.", e);
-                mCallback.onMountError();
-            } catch (IllegalArgumentException e) {
-                Log.e(TAG, "Something went wrong: " + e.getMessage());
-                mCallback.onMountError();
             }
         }
 
@@ -280,8 +266,8 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
 
     private Rect mInitialCropRegion;
 
-    Camera2(Callback callback, PreviewImpl preview, Context context) {
-        super(callback, preview);
+    Camera2(Callback callback, PreviewImpl preview, Context context, Handler bgHandler) {
+        super(callback, preview, bgHandler);
         mCameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
         mCameraManager.registerAvailabilityCallback(new CameraManager.AvailabilityCallback() {
             @Override
@@ -321,12 +307,9 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
         mInitialRatio = null;
         prepareStillImageReader();
         prepareScanImageReader();
-        startBackgroundThread();
         startOpeningCamera();
         return true;
     }
-
-
 
     @Override
     void stop() {
@@ -360,8 +343,6 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
                 mIsRecording = false;
             }
         }
-        stopBackgroundThread();
-
     }
 
     @Override
@@ -728,16 +709,6 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
         //mPreview.setDisplayOrientation(deviceOrientation); // this is not needed and messes up the display orientation
     }
 
-    private void handleFailedCamera(Exception e) {
-        mCaptureSession = null;
-        if (cameraRetryCounter <= MAX_CAMERA_RETRY) {
-            cameraRetryCounter++;
-            startCaptureSession();
-        } else {
-            mCallback.onMountError();
-        }
-    }
-
     /**
      * <p>Chooses a camera ID by the specified camera facing ({@link #mFacing}).</p>
      * <p>This rewrites {@link #mCameraId}, {@link #mCameraCharacteristics}, and optionally
@@ -821,6 +792,7 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
                         break;
                     }
                 }
+
                 mCameraId = _mCameraId;
                 return true;
             }
@@ -892,34 +864,13 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
         mScanImageReader.setOnImageAvailableListener(mOnImageAvailableListener, null);
     }
 
-    private void startBackgroundThread() {
-        backgroundThread = new HandlerThread("CameraBackgroundThread");
-        backgroundThread.start();
-        backgroundHandler = new Handler(backgroundThread.getLooper());
-    }
-
-    private void stopBackgroundThread() {
-        if (backgroundThread != null) {
-            backgroundThread.quitSafely();
-            try {
-                backgroundThread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            backgroundThread = null;
-            backgroundHandler = null;
-        }
-
-    }
-
-
     /**
      * <p>Starts opening a camera device.</p>
      * <p>The result will be processed in {@link #mCameraDeviceCallback}.</p>
      */
     private void startOpeningCamera() {
         try {
-            mCameraManager.openCamera(mCameraId, mCameraDeviceCallback, backgroundHandler);
+            mCameraManager.openCamera(mCameraId, mCameraDeviceCallback, null);
         } catch (CameraAccessException e) {
             throw new RuntimeException("Failed to open camera: " + mCameraId, e);
         }
@@ -946,9 +897,8 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
             }
             mCamera.createCaptureSession(Arrays.asList(surface, mStillImageReader.getSurface(),
                     mScanImageReader.getSurface()), mSessionCallback, null);
-            cameraRetryCounter = 0;
         } catch (CameraAccessException e) {
-            handleFailedCamera(e);
+            mCallback.onMountError();
         }
     }
 
@@ -1307,6 +1257,13 @@ class Camera2 extends CameraViewImpl implements MediaRecorder.OnInfoListener, Me
                     break;
             }
             captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, getOutputRotation());
+
+
+            if(mCaptureCallback.getOptions().hasKey("quality")){
+                int quality = (int) (mCaptureCallback.getOptions().getDouble("quality") * 100);
+                captureRequestBuilder.set(CaptureRequest.JPEG_QUALITY, (byte)quality);
+            }
+
             captureRequestBuilder.set(CaptureRequest.SCALER_CROP_REGION, mPreviewRequestBuilder.get(CaptureRequest.SCALER_CROP_REGION));
             // Stop preview and capture a still picture.
             mCaptureSession.stopRepeating();
