@@ -1158,6 +1158,11 @@ BOOL _sessionInterrupted = NO;
     dispatch_async(self.sessionQueue, ^{
         if ([self.movieFileOutput isRecording]) {
             [self.movieFileOutput stopRecording];
+             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), self.sessionQueue, ^(void){
+                // our session might have stopped in between the timeout
+                // so make sure it is still valid, otherwise, error and cleanup
+                [self cleanupCamera];
+            });
         } else {
             if(_recordRequested){
                 _recordRequested = NO;
