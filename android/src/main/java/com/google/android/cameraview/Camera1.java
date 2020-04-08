@@ -22,6 +22,7 @@ import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.media.MediaActionSound;
 import android.os.Build;
 import android.os.Handler;
 import androidx.collection.SparseArrayCompat;
@@ -82,6 +83,9 @@ class Camera1 extends CameraViewImpl implements MediaRecorder.OnInfoListener,
 
     Camera mCamera;
 
+    // do not instantiate this every time since it allocates unnecessary resources
+    MediaActionSound sound = new MediaActionSound();
+
     private Camera.Parameters mCameraParameters;
 
     private final Camera.CameraInfo mCameraInfo = new Camera.CameraInfo();
@@ -122,6 +126,8 @@ class Camera1 extends CameraViewImpl implements MediaRecorder.OnInfoListener,
     private int mWhiteBalance;
 
     private boolean mIsScanning;
+
+    private Boolean mPlaySoundOnCapture = false;
 
     private boolean mustUpdateSurface;
     private boolean surfaceWasDestroyed;
@@ -750,6 +756,10 @@ class Camera1 extends CameraViewImpl implements MediaRecorder.OnInfoListener,
                         // this shouldn't be needed and messes up autoFocusPointOfInterest
                         // camera.cancelAutoFocus();
 
+                        if(mPlaySoundOnCapture){
+                            sound.play(MediaActionSound.SHUTTER_CLICK);
+                        }
+
                         if (options.hasKey("pauseAfterCapture") && !options.getBoolean("pauseAfterCapture")) {
                             camera.startPreview();
                             mIsPreviewActive = true;
@@ -927,24 +937,34 @@ class Camera1 extends CameraViewImpl implements MediaRecorder.OnInfoListener,
      */
     private void chooseCamera() {
         if(_mCameraId == null){
-            int count = Camera.getNumberOfCameras();
-            if(count == 0){
-                //throw new RuntimeException("No camera available.");
-                mCameraId = INVALID_CAMERA_ID;
-                Log.w("CAMERA_1::", "getNumberOfCameras returned 0. No camera available.");
-                return;
-            }
 
-            for (int i = 0; i < count; i++) {
-                Camera.getCameraInfo(i, mCameraInfo);
-                if (mCameraInfo.facing == mFacing) {
-                    mCameraId = i;
+            try{
+                int count = Camera.getNumberOfCameras();
+                if(count == 0){
+                    //throw new RuntimeException("No camera available.");
+                    mCameraId = INVALID_CAMERA_ID;
+                    Log.w("CAMERA_1::", "getNumberOfCameras returned 0. No camera available.");
                     return;
                 }
+
+                for (int i = 0; i < count; i++) {
+                    Camera.getCameraInfo(i, mCameraInfo);
+                    if (mCameraInfo.facing == mFacing) {
+                        mCameraId = i;
+                        return;
+                    }
+                }
+                // no camera found, set the one we have
+                mCameraId = 0;
+                Camera.getCameraInfo(mCameraId, mCameraInfo);
             }
-            // no camera found, set the one we have
-            mCameraId = 0;
-            Camera.getCameraInfo(mCameraId, mCameraInfo);
+            // getCameraInfo may fail if hardware is unavailable
+            // and crash the whole app. Return INVALID_CAMERA_ID
+            // which will in turn fire a mount error event
+            catch(Exception e){
+                Log.e("CAMERA_1::", "chooseCamera failed.", e);
+                mCameraId = INVALID_CAMERA_ID;
+            }
         }
         else{
             try{
@@ -1048,6 +1068,8 @@ class Camera1 extends CameraViewImpl implements MediaRecorder.OnInfoListener,
         setZoomInternal(mZoom);
         setWhiteBalanceInternal(mWhiteBalance);
         setScanningInternal(mIsScanning);
+        setPlaySoundInternal(mPlaySoundOnCapture);
+
         try{
             mCamera.setParameters(mCameraParameters);
         }
@@ -1424,6 +1446,42 @@ class Camera1 extends CameraViewImpl implements MediaRecorder.OnInfoListener,
                 mCamera.setPreviewCallback(null);
             }
         }
+    }
+
+    private void setPlaySoundInternal(boolean playSoundOnCapture){
+        mPlaySoundOnCapture = playSoundOnCapture;
+        if(mCamera != null){
+            try{
+                // Always disable shutter sound, and play our own.
+                // This is because not all devices honor this value when set to true
+                boolean res = mCamera.enableShutterSound(false);
+
+                // if we fail to disable the shutter sound
+                // set mPlaySoundOnCapture to false since it means
+                // we cannot change it and the system will play it
+                // playing the sound ourselves also makes it consistent with Camera2
+                if(!res){
+                    mPlaySoundOnCapture = false;
+                }
+            }
+            catch(Exception ex){
+                Log.e("CAMERA_1::", "setPlaySoundInternal failed", ex);
+                mPlaySoundOnCapture = false;
+            }
+        }
+    }
+
+    @Override
+    void setPlaySoundOnCapture(boolean playSoundOnCapture) {
+        if (playSoundOnCapture == mPlaySoundOnCapture) {
+            return;
+        }
+        setPlaySoundInternal(playSoundOnCapture);
+    }
+
+    @Override
+    public boolean getPlaySoundOnCapture(){
+        return mPlaySoundOnCapture;
     }
 
     @Override

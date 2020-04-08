@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.CamcorderProfile;
-import android.media.MediaActionSound;
 import android.os.Build;
 import androidx.core.content.ContextCompat;
 import android.view.View;
@@ -36,7 +35,6 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
   private Map<Promise, File> mPictureTakenDirectories = new ConcurrentHashMap<>();
   private Promise mVideoRecordedPromise;
   private List<String> mBarCodeTypes = null;
-  private Boolean mPlaySoundOnCapture = false;
 
   private boolean mIsPaused = false;
   private boolean mIsNew = true;
@@ -66,6 +64,15 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
   private boolean mTrackingEnabled = true;
   private int mPaddingX;
   private int mPaddingY;
+
+  // Limit Android Scan Area
+  private boolean mLimitScanArea = false;
+  private float mScanAreaX = 0.0f;
+  private float mScanAreaY = 0.0f;
+  private float mScanAreaWidth = 0.0f;
+  private float mScanAreaHeight = 0.0f;
+  private int mCameraViewWidth = 0;
+  private int mCameraViewHeight = 0;
 
   public RNCameraView(ThemedReactContext themedReactContext) {
     super(themedReactContext, true);
@@ -152,7 +159,7 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
         if (willCallBarCodeTask) {
           barCodeScannerTaskLock = true;
           BarCodeScannerAsyncTaskDelegate delegate = (BarCodeScannerAsyncTaskDelegate) cameraView;
-          new BarCodeScannerAsyncTask(delegate, mMultiFormatReader, data, width, height).execute();
+          new BarCodeScannerAsyncTask(delegate, mMultiFormatReader, data, width, height, mLimitScanArea, mScanAreaX, mScanAreaY, mScanAreaWidth, mScanAreaHeight, mCameraViewWidth, mCameraViewHeight, getAspectRatio().toFloat()).execute();
         }
 
         if (willCallFaceTask) {
@@ -236,21 +243,16 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
     initBarcodeReader();
   }
 
-  public void setPlaySoundOnCapture(Boolean playSoundOnCapture) {
-    mPlaySoundOnCapture = playSoundOnCapture;
-  }
-
   public void takePicture(final ReadableMap options, final Promise promise, final File cacheDirectory) {
     mBgHandler.post(new Runnable() {
       @Override
       public void run() {
+        final File path = options.hasKey("path") ?  new File(options.getString("path"))  : cacheDirectory;
+        
         mPictureTakenPromises.add(promise);
         mPictureTakenOptions.put(promise, options);
-        mPictureTakenDirectories.put(promise, cacheDirectory);
-        if (mPlaySoundOnCapture) {
-          MediaActionSound sound = new MediaActionSound();
-          sound.play(MediaActionSound.SHUTTER_CLICK);
-        }
+        mPictureTakenDirectories.put(promise, path);
+
         try {
           RNCameraView.super.takePicture(options);
         } catch (Exception e) {
@@ -354,6 +356,19 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
     if(mMultiFormatReader != null) {
       mMultiFormatReader.reset();
     }
+  }
+
+  // Limit Scan Area
+  public void setRectOfInterest(float x, float y, float width, float height) {
+    this.mLimitScanArea = true;
+    this.mScanAreaX = x;
+    this.mScanAreaY = y;
+    this.mScanAreaWidth = width;
+    this.mScanAreaHeight = height;
+  }
+    public void setCameraViewDimensions(int width, int height) {
+    this.mCameraViewWidth = width;
+    this.mCameraViewHeight = height;
   }
 
   /**

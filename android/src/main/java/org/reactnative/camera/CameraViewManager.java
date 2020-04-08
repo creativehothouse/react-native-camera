@@ -129,6 +129,11 @@ public class CameraViewManager extends ViewGroupManager<RNCameraView> {
     view.setPictureSize(size.equals("None") ? null : Size.parse(size));
   }
 
+  @ReactProp(name = "playSoundOnCapture")
+  public void setPlaySoundOnCapture(RNCameraView view, boolean playSoundOnCapture) {
+    view.setPlaySoundOnCapture(playSoundOnCapture);
+  }
+
   @ReactProp(name = "barCodeTypes")
   public void setBarCodeTypes(RNCameraView view, ReadableArray barCodeTypes) {
     if (barCodeTypes == null) {
@@ -149,11 +154,6 @@ public class CameraViewManager extends ViewGroupManager<RNCameraView> {
   @ReactProp(name = "useCamera2Api")
   public void setUseCamera2Api(RNCameraView view, boolean useCamera2Api) {
     view.setUsingCamera2Api(useCamera2Api);
-  }
-
-  @ReactProp(name = "playSoundOnCapture")
-  public void setPlaySoundOnCapture(RNCameraView view, boolean playSoundOnCapture) {
-    view.setPlaySoundOnCapture(playSoundOnCapture);
   }
 
   @ReactProp(name = "faceDetectorEnabled")
@@ -200,4 +200,26 @@ public class CameraViewManager extends ViewGroupManager<RNCameraView> {
   public void setTextRecognizing(RNCameraView view, boolean textRecognizerEnabled) {
     view.setShouldRecognizeText(textRecognizerEnabled);
   }
+
+  /**---limit scan area addition---**/
+  @ReactProp(name = "rectOfInterest")
+  public void setRectOfInterest(RNCameraView view, ReadableMap coordinates) {
+    if(coordinates != null){
+      float x = (float) coordinates.getDouble("x");
+      float y = (float) coordinates.getDouble("y");
+      float width = (float) coordinates.getDouble("width");
+      float height = (float) coordinates.getDouble("height");
+      view.setRectOfInterest(x, y, width, height);
+    }
+  }
+
+  @ReactProp(name = "cameraViewDimensions")
+  public void setCameraViewDimensions(RNCameraView view, ReadableMap dimensions) {
+    if(dimensions != null){
+      int cameraViewWidth = (int) dimensions.getDouble("width");
+      int cameraViewHeight = (int) dimensions.getDouble("height");
+      view.setCameraViewDimensions(cameraViewWidth, cameraViewHeight);
+    }
+  }
+  /**---limit scan area addition---**/
 }
