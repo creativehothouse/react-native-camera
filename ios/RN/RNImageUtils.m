@@ -40,24 +40,14 @@
 
 + (UIImage *)mirrorImage:(UIImage *)image
 {
-    UIImageOrientation flippedOrientation = UIImageOrientationUpMirrored;
-    switch (image.imageOrientation) {
-        case UIImageOrientationDown:
-            flippedOrientation = UIImageOrientationDownMirrored;
-            break;
-        case UIImageOrientationLeft:
-            flippedOrientation = UIImageOrientationRightMirrored;
-            break;
-        case UIImageOrientationUp:
-            flippedOrientation = UIImageOrientationUpMirrored;
-            break;
-        case UIImageOrientationRight:
-            flippedOrientation = UIImageOrientationLeftMirrored;
-            break;
-        default:
-            break;
-    }
-    UIImage * flippedImage = [UIImage imageWithCGImage:image.CGImage scale:image.scale orientation:flippedOrientation];
+    UIGraphicsBeginImageContextWithOptions(image.size, false, image.scale);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextTranslateCTM(context, image.size.width, 0);
+    CGContextScaleCTM(context, -image.scale, image.scale);
+    [image drawInRect:CGRectMake(0, 0, image.size.width, image.size.height)];
+    UIImage * flippedImage  = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
     return flippedImage;
 }
 
@@ -83,14 +73,13 @@
 
 + (UIImage *)forceUpOrientation:(UIImage *)image
 {
-    if (image.imageOrientation != UIImageOrientationUp) {
         UIGraphicsBeginImageContextWithOptions(image.size, NO, image.scale);
         [image drawInRect:CGRectMake(0, 0, image.size.width, image.size.height)];
         image = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
-    }
+
     return image;
-} 
+}
 
 
 + (void)updatePhotoMetadata:(CMSampleBufferRef)imageSampleBuffer withAdditionalData:(NSDictionary *)additionalData inResponse:(NSMutableDictionary *)response
